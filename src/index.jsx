@@ -1,6 +1,8 @@
 import React from "react";
 import {render} from "react-dom";
 
-import Synth from "./components/synth/index.jsx";
+import SimpleSynth from "./components/Simple-Synth/index.jsx";
+import MidiSynth from "./components/Midi-Synth/index.jsx";
 
-render(<Synth/>, document.getElementById("app"));
+render(<SimpleSynth/>, document.getElementById("app"));
+render(<MidiSynth/>, document.getElementById("app"));
