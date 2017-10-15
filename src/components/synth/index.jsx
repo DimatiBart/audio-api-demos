@@ -3,9 +3,9 @@ import React from "react";
 export default class Synth extends React.Component {
     constructor(props) {
         super(props);
-        this.pitch = 55;
+        this.pitchStandard = 440;
         this.currentOctave = 0;
-        this.pressedNote = null;
+        this.pressedKey = 4;
         this.waves = {
             "sine":"Sine",
             "square": "Square",
@@ -23,7 +23,7 @@ export default class Synth extends React.Component {
         this.VCO.start();
 
         this.state = {
-            currentPitch: this.pitch * 2**this.currentOctave,
+            currentPitch: this.getNoteFrequency(this.currentOctave, this.pressedKey),
             VCOType: "sine"
         };
 
@@ -31,6 +31,9 @@ export default class Synth extends React.Component {
         this.handleUp = this.handleUp.bind(this);
         this.handleOctaveUp = this.handleOctaveUp.bind(this);
         this.handleOctaveDown = this.handleOctaveDown.bind(this);
+    }
+    getNoteFrequency(octave, key) {
+        return 2**((octave *  12 + key - 49)/12) * this.pitchStandard;
     }
     handleDown() {
         this.VCO.frequency.value = this.state.currentPitch;
@@ -43,13 +46,13 @@ export default class Synth extends React.Component {
     handleOctaveUp() {
         if (this.currentOctave < 10) {
             this.currentOctave++;
-            this.setState({currentPitch: this.pitch * 2**this.currentOctave})
+            this.setState({currentPitch: this.getNoteFrequency(this.currentOctave, this.pressedKey)})
         }
     }
     handleOctaveDown() {
         if (this.currentOctave > 0) {
             this.currentOctave--;
-            this.setState({currentPitch: this.pitch * 2**this.currentOctave})
+            this.setState({currentPitch: this.getNoteFrequency(this.currentOctave, this.pressedKey)})
         }
     }
     changeVCO(value) {
@@ -82,7 +85,7 @@ export default class Synth extends React.Component {
                 <button onClick={this.handleOctaveUp}>+</button>,
                 <button onClick={this.handleOctaveDown}>-</button>,
                 <button onMouseDown={this.handleDown}
-                        onMouseUp={this.handleUp}>Smack my bitch up!</button>
+                        onMouseUp={this.handleUp}>Smack my pitch up!</button>
        ]
     }
 }
