@@ -21,6 +21,8 @@ export default class Synth extends React.Component {
         this.VCO.connect(this.VCA);
         this.VCO.start();
 
+        this.VCA.connect(this.audioContext.destination);
+
         this.synthState = {
             currentPitch: 0,
             latestPressedKey: 0,
@@ -32,6 +34,7 @@ export default class Synth extends React.Component {
         };
 
         this.onKeyPress = this.onKeyPress.bind(this);
+        this.changeFrequency = this.changeFrequency.bind(this);
 
         this.midiController = new MidiController(this.onKeyPress);
     }
@@ -72,10 +75,15 @@ export default class Synth extends React.Component {
             this.playNote();
         }
     }
+    changeFrequency(event) {
+        if (this.VCA.gain.value !== 0) {
+            this.VCA.gain.value = event.target.value * this.synthState.currentPitch;
+        }
+    }
     changeVCO(value) {
         this.setState({VCOType: value});
     }
-    renderRadio(){
+    renderPanel(){
         return (
             <div>
                 {Object.keys(this.waves).map(elem => (
@@ -88,13 +96,14 @@ export default class Synth extends React.Component {
                         <label htmlFor={elem}>{this.waves[elem]}</label>
                     </div>
                 ))}
+                <input type="range" min="0" step="0.01" max="1" onChange={this.changeFrequency}/>
             </div>
         )
     }
     render() {
-        return [
-            <div>{this.renderRadio()}</div>,
+        return <div>
+            {this.renderPanel()}
             <Filters audioContext={this.audioContext} origin={this.VCA} destination={this.audioContext.destination}/>
-        ]
+        </div>
     }
 }

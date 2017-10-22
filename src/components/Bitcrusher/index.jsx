@@ -7,17 +7,12 @@ export default class Bitcrusher extends React.Component {
         this.bits = 16;
         this.normfreq = 1;
         this.bitcrusher = new Bitcrush(this.props.audioContext, this.bits, this.normfreq);
+        this.node = this.bitcrusher.getNode();
         this.state = {
             enabled: false
-        }
+        };
 
-        this.handleSwitch = this.handleSwitch.bind(this);
-    }
-    componentDidMount() {
-        let node = this.bitcrusher.getNode();
-        this.props.origin.connect(node);
-        node.connect(this.props.destination)
-        //this.props.origin.connect(this.props.destination);
+        this.toggleFilter = this.toggleFilter.bind(this);
     }
     changeBits(value) {
         this.bits = value;
@@ -27,13 +22,16 @@ export default class Bitcrusher extends React.Component {
         this.normfreq = value;
         this.bitcrusher.changeFreq(this.normfreq);
     }
-    handleSwitch(event) {
-        this.setState({enabled : !this.state.enabled});
+    toggleFilter(event) {
+        let isEnabled = !this.state.enabled;
+        this.props.onToggle(this.node, isEnabled, "bitcrusher");
+        this.setState({enabled : isEnabled});
     }
     render() {
         return (
             <div>
-                <input type="checkbox" checked={this.state.enabled} onChange={this.handleSwitch}/>
+                <span>Bitcrusher</span>
+                <input type="checkbox" checked={this.state.enabled} onChange={this.toggleFilter}/>
                 <input min="1" step="0.5" max="16" onChange={e => this.changeBits(e.currentTarget.value)} type="range"/>
             </div>
         )
