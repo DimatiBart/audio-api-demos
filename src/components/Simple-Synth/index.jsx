@@ -1,4 +1,5 @@
 import React from "react";
+import Oscilloscope from "oscilloscope";
 
 export default class Synth extends React.Component {
     constructor(props) {
@@ -16,10 +17,13 @@ export default class Synth extends React.Component {
         this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
         this.VCO = this.audioContext.createOscillator();
         this.VCA = this.audioContext.createGain();
+        this.analyzer = this.audioContext.createAnalyser();
         this.VCA.gain.value = 0;
 
         this.VCO.connect(this.VCA);
-        this.VCA.connect(this.audioContext.destination);
+        this.VCA.connect(this.analyzer);
+        this.analyzer.connect(this.audioContext.destination);
+        this.scope = new Oscilloscope(this.analyzer);
         this.VCO.start();
 
         this.state = {
@@ -31,6 +35,10 @@ export default class Synth extends React.Component {
         this.handleUp = this.handleUp.bind(this);
         this.handleOctaveUp = this.handleOctaveUp.bind(this);
         this.handleOctaveDown = this.handleOctaveDown.bind(this);
+    }
+    componentDidMount() {
+        this.canvas.width  = window.innerWidth;
+        this.scope.animate(this.canvas.getContext("2d"));
     }
     getNoteFrequency(octave, key) {
         return 2**((octave *  12 + key - 49)/12) * this.pitchStandard;
@@ -85,7 +93,8 @@ export default class Synth extends React.Component {
                 <button onClick={this.handleOctaveUp}>+</button>,
                 <button onClick={this.handleOctaveDown}>-</button>,
                 <button onMouseDown={this.handleDown}
-                        onMouseUp={this.handleUp}>Smack my pitch up!</button>
+                        onMouseUp={this.handleUp}>Smack my pitch up!</button>,
+                <canvas style={{display: "block", width: "100%"}} width="500" height="400" ref={canvas => this.canvas = canvas}/>
        ]
     }
 }
