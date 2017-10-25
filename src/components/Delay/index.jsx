@@ -22,7 +22,7 @@ export default class DelayFilter extends React.Component {
     }
     toggleFilter() {
         let isEnabled = !this.state.enabled;
-        this.props.onToggle(this.delayFilter, isEnabled, "delay");
+        this.props.onToggle(this.delayFilter, isEnabled, "delay", () => this.connectToNeightbours());
 
         if (isEnabled) {
             this.delayFilter.connect(this.feedback);
@@ -35,6 +35,11 @@ export default class DelayFilter extends React.Component {
         }
 
         this.setState({enabled : isEnabled});
+    }
+    connectToNeightbours(){
+        this.delayFilter.connect(this.feedback);
+        this.feedback.connect(this.filter);
+        this.filter.connect(this.delayFilter);
     }
     changeDelay(value) {
         this.delayFilter.delayTime.value = value;

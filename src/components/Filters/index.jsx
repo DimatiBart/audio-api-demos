@@ -13,20 +13,21 @@ export default class Filters extends React.Component {
         this.originNodes = [{node: this.origin, type: "gain"}];
         this.onFilterToggle = this.onFilterToggle.bind(this);
     }
-    onFilterToggle(node, isEnabled, type) {
+    onFilterToggle(node, isEnabled, type, disconnectCallBack) {
         let lastOriginIndex = this.originNodes.length - 1;
         if (isEnabled) {
-            if (this.originNodes[lastOriginIndex].type === "delay") {
-                this.originNodes[lastOriginIndex - 1].node.disconnect();
-                this.originNodes[lastOriginIndex - 1].node.connect(node);
-                this.originNodes[lastOriginIndex - 1].node.connect(this.originNodes[lastOriginIndex].node);
-            }
-
             this.originNodes[lastOriginIndex].node.disconnect();
             this.originNodes[lastOriginIndex].node.connect(node);
             node.connect(this.props.destination);
 
-            this.originNodes.push({node, type});
+            if (this.originNodes[lastOriginIndex].type === "delay") {
+                this.originNodes[lastOriginIndex - 1].node.disconnect();
+                this.originNodes[lastOriginIndex].disconnectCallBack();
+                this.originNodes[lastOriginIndex - 1].node.connect(node);
+                this.originNodes[lastOriginIndex - 1].node.connect(this.originNodes[lastOriginIndex].node);
+            }
+
+            this.originNodes.push({node, type, disconnectCallBack});
 
             if (type === "delay") {
                 this.originNodes[lastOriginIndex].node.connect(this.props.destination);
@@ -47,6 +48,7 @@ export default class Filters extends React.Component {
             node.disconnect();
 
             if (this.originNodes[nodeOriginIndex - 1].type === "delay") {
+                this.originNodes[nodeOriginIndex - 1].disconnectCallBack();
                 this.originNodes[nodeOriginIndex - 2].node.disconnect();
                 this.originNodes[nodeOriginIndex - 2].node.connect(destination);
                 this.originNodes[nodeOriginIndex - 2].node.connect(this.originNodes[lastOriginIndex - 1].node);

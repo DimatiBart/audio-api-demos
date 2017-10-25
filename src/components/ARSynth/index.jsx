@@ -1,6 +1,5 @@
 import React from "react";
 import Oscilloscope from "oscilloscope";
-import Filters from "../Filters/index.jsx";
 import MidiController from "../../controllers/MidiController";
 
 export default class Synth extends React.Component {
@@ -58,13 +57,19 @@ export default class Synth extends React.Component {
     playNote() {
         let now = this.audioContext.currentTime;
         this.VCO.type = this.state.VCOType;
+        //this.VCA.gain.cancelScheduledValues(now);
+        //this.VCA.gain.setValueAtTime(0, now);
         this.VCO.frequency.value = this.synthState.currentPitch;
         this.VCO.frequency.setValueAtTime(this.synthState.currentPitch, now);
         this.VCA.gain.linearRampToValueAtTime(1, now + this.state.attack);
         this.synthState.attackEnd = new Date().getTime() + this.state.attack * 1000;
+        //this.VCA.gain.value = 1;
     }
     continueNote() {
-        this.VCO.frequency.value = this.synthState.currentPitch;
+        let now = this.audioContext.currentTime;
+        //this.VCO.frequency.cancelScheduledValues(now);
+        //this.VCO.frequency.linearRampToValueAtTime(this.synthState.currentPitch, now);
+        this.VCO.frequency.value = this.synthState.currentPitch
     }
     releaseNote() {
         let now = this.audioContext.currentTime,
@@ -76,6 +81,10 @@ export default class Synth extends React.Component {
         else {
             setTimeout(this.releaseNote.bind(this), timeDifference);
         }
+
+        //this.VCA.gain.value = 0;
+
+        //this.VCA.gain.exponentialRampToValueAtTime(0.0001, now + this.state.release);
     }
     onKeyPress(event) {
         let pressedKey = event.data[1];
@@ -138,7 +147,6 @@ export default class Synth extends React.Component {
     render() {
         return <div>
             {this.renderPanel()}
-            <Filters audioContext={this.audioContext} origin={this.VCA} destination={this.analyzer}/>
             <canvas style={{display: "block", width: "100%"}} width="500" height="400" ref={canvas => this.canvas = canvas}/>
         </div>
     }
