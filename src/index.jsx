@@ -6,7 +6,19 @@ import MidiSynth from "./components/Midi-Synth/index.jsx";
 import FilteredSynth from "./components/Filtered-Synth/index.jsx";
 import ARSynth from "./components/ARSynth/index.jsx";
 
-//render(<SimpleSynth/>, document.getElementById("app"));
-//render(<MidiSynth/>, document.getElementById("app"));
-render(<FilteredSynth/>, document.getElementById("app"));
-//render(<ARSynth/>, document.getElementById("app"));
+let app = document.getElementById("app");
+
+switch (app.className) {
+    case "S":
+        render(<SimpleSynth/>, app);
+        break;
+    case "M":
+        render(<MidiSynth/>, app);
+        break;
+    case "AR":
+        render(<ARSynth/>, app);
+        break;
+    case "F":
+        render(<FilteredSynth/>, app);
+        break;
+}
